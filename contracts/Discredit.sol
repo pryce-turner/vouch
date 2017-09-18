@@ -15,10 +15,10 @@ contract Discredit is Identity {
         uint voteFake;
     }
 
-//    Voter[] public voters;
+    Voter[] public voters;
     
     mapping (address => Count) public count;
-    mapping (address => Voter) public voters;
+    mapping (address => uint) public voterID;
     uint numVoters;
    
     address upForVote;
@@ -32,26 +32,28 @@ contract Discredit is Identity {
     }
 
     function register () {
-        require ((verifiedConnections[upForVote][msg.sender]) && (verifiedConnections[msg.sender][upForVote]));
+//        require ((verifiedConnections[upForVote][msg.sender]) && (verifiedConnections[msg.sender][upForVote]));
         require ((startTime <= block.number) && (block.number <= endTime));
-        voters[msg.sender].voteType = 3;  //voteType of 3 means they haven't voted yet.
-        voters[msg.sender].voted = false;
-        numVoters++;
+        voters.push(Voter({
+            voteType: 3,
+            voted: false
+        }));
+        voterID[msg.sender] = (voters.length) - 1;
     }
 
     function castVote (bool voteType) {
-        require (!(voters[msg.sender].voted));
-        require ((verifiedConnections[upForVote][msg.sender]) && (verifiedConnections[msg.sender][upForVote]));
+        require (!(voters[voterID[msg.sender]].voted));
+//        require ((verifiedConnections[upForVote][msg.sender]) && (verifiedConnections[msg.sender][upForVote]));
         require ((startTime <= block.number) && (block.number <= endTime));
         if (voteType) //True here meaning "Real" account.
         count[upForVote].voteReal++;
         if (!voteType) //False here meaning "Fake" acount.
         count[upForVote].voteFake++;
-        voters[msg.sender].voted = true;
+        voters[voterID[msg.sender]].voted = true;
     }
 
     function getVoteType (address target) returns (uint) {
-        return voters[target].voteType;
+        return voters[voterID[target]].voteType;
     }
 
     function getVoteCount (bool voteType) returns (uint) {
