@@ -1,0 +1,24 @@
+{
+  "contract_name": "Playground",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "gone",
+      "outputs": [],
+      "payable": true,
+      "type": "function"
+    }
+  ],
+  "unlinked_binary": "0x60606040523415600b57fe5b5b60578060196000396000f300606060405263ffffffff60e060020a6000350416631664030d81146020575bfe5b60266028565b005b5b5600a165627a7a723058207d56fc6917c14c627c4da89810962422810d2c7176cd0cb252572575cc6d6df70029",
+  "networks": {
+    "1504020619640": {
+      "events": {},
+      "links": {},
+      "address": "0xf47ffdea3115b3755f05c56394b9bf252c8af08f",
+      "updated_at": 1504021126541
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1504021126541
+}

@@ -1,0 +1,17 @@
+{
+  "contract_name": "Sink",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "gone",
+      "outputs": [],
+      "payable": true,
+      "type": "function"
+    }
+  ],
+  "unlinked_binary": "0x60606040523415600b57fe5b5b60578060196000396000f300606060405263ffffffff60e060020a6000350416631664030d81146020575bfe5b60266028565b005b5b5600a165627a7a72305820fd2cbd5797265efbf0767ab23d6c97e147a26400dcb552eae60dc539f3a62bc70029",
+  "networks": {},
+  "schema_version": "0.0.5",
+  "updated_at": 1504021077890
+}
