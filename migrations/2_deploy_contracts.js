@@ -7,5 +7,5 @@ module.exports = function(deployer) {
   deployer.deploy(Identity);
   deployer.deploy(Identitoken);
   deployer.deploy(Owned);
-  deployer.deploy(Discredit, "0x1b2682de57d5d1aeb09617f415af3ddb3acde1e8");
+  deployer.deploy(Discredit, "0xc1334170b3743b16ae29c47cd4a97f9c35a96ac5");
 };
