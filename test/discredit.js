@@ -25,7 +25,7 @@ contract ('Discredit', function (accounts) {
         }).then(function (X) {
             voteType = X;
 
-            assert.equal(voteType, 3, "Message Sender did not register.")
+            assert.equal(voteType, 2, "Message Sender did not register.")
         });
     });
     it("should vote real.", function () {
