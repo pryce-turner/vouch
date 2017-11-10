@@ -8,6 +8,7 @@ contract Discredit is Identity {
     struct Voter {
         uint8 voteType;
         bool voted;
+        address voterAddress;
     }
 
     struct Count {
@@ -26,7 +27,7 @@ contract Discredit is Identity {
     uint endTime;
 
     modifier canVote {
-        require ((verifiedConnections[upForVote][msg.sender]) && (verifiedConnections[msg.sender][upForVote]));
+        require ((approvedConnections[upForVote][msg.sender]) && (approvedConnections[msg.sender][upForVote]));
         require ((startTime <= block.number) && (block.number <= endTime));
         _;
     }
@@ -39,27 +40,50 @@ contract Discredit is Identity {
 
     function register () canVote {
         voters.push(Voter({
-            voteType: 3,
-            voted: false
+            voteType: 2,
+            voted: false,
+            voterAddress: msg.sender 
         }));
         voterID[msg.sender] = (voters.length) - 1;
     }
 
-    function castVote (bool voteType) canVote {
+    function castVote (uint voteType) canVote {
         require (!(voters[voterID[msg.sender]].voted));
-        if (voteType) //True here meaning "Real" account.
+        if (voteType == 1) {//1 here meaning "Real" account.
         count[upForVote].voteReal++;
-        if (!voteType) //False here meaning "Fake" acount.
+        voters[voterID[msg.sender]].voteType = 1;
+        }
+        if (voteType == 0) {//0 here meaning "Fake" acount.
         count[upForVote].voteFake++;
+        voters[voterID[msg.sender]].voteType = 0;
+        }
         voters[voterID[msg.sender]].voted = true;
     }
 
     function executeOutcomes () {
 //        require (block.number >= endTime);
         bool outcome = ((count[upForVote].voteReal) > (count[upForVote].voteFake));
-        for (i = 0; i<voters.length; i++) {
-            if ((voters[i].voteType == 0) && (outcome = 0)
-            _transfer(upForVote, )
+        for (var i = 0; i<voters.length; i++) {
+            if ((voters[i].voteType == 0) && (outcome == false)) { //Voted fake, account fake.
+            identityFundBalance[upForVote] -= standardDeposit;
+            balanceOf[voters[i].voterAddress] += standardDeposit;
+            approvedConnections[upForVote][voters[i].voterAddress] = false;
+            approvedConnections[voters[i].voterAddress][upForVote] = false;
+            } else if ((voters[i].voteType == 1) && (outcome == false)) { //Voted real, account fake.
+            identityFundBalance[upForVote] -= standardDeposit;
+            identityFundBalance[voters[i].voterAddress] -= standardDeposit; //Need to send the deposit somewhere..
+            approvedConnections[upForVote][voters[i].voterAddress] = false;
+            approvedConnections[voters[i].voterAddress][upForVote] = false;
+            isFrozen[voters[i].voterAddress] = true;
+            } else if ((voters[i].voteType == 0) && (outcome == true)) { //Voted fake, account real.
+            identityFundBalance[voters[i].voterAddress] -= standardDeposit;
+            identityFundBalance[upForVote] += standardDeposit;
+            approvedConnections[upForVote][voters[i].voterAddress] = false;
+            approvedConnections[voters[i].voterAddress][upForVote] = false;
+            } else {
+            approvedConnections[upForVote][voters[i].voterAddress] = false;
+            approvedConnections[voters[i].voterAddress][upForVote] = false;
+            }
         }
     }
 
