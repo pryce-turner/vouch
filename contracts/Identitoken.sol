@@ -13,23 +13,23 @@ contract Identitoken is Owned {
 
     event Transfer (address indexed from, address indexed to, uint value);
 
-    mapping (address => uint) public balanceOf;
+    mapping (address => uint) public balances;
     mapping (address => bool) public isFrozen;
  
     function Identitoken (
         uint initialSupply
     ) {
-        balanceOf[this] = initialSupply;
+        balances[this] = initialSupply;
         totalSupply = initialSupply;
         name = "Identitoken";
         buyPrice = 1;
     }
 
     function _transfer (address _from, address _to, uint _value) internal {
-        require (balanceOf[_from] > _value);
-        require (balanceOf[_to] + _value > balanceOf[_to]);
-        balanceOf[_from] -= _value;
-        balanceOf[_to] += _value;
+        require (balances[_from] > _value);
+        require (balances[_to] + _value > balances[_to]);
+        balances[_from] -= _value;
+        balances[_to] += _value;
         Transfer (_from, _to, _value);
     }
 
@@ -52,7 +52,11 @@ contract Identitoken is Owned {
         isFrozen[target] = true;
     }
 
-    function getBalanceOf (address addr) returns (uint) {
-        return balanceOf[addr];
+    function balanceOf (address _owner) constant returns (uint balance) {
+        return balances[_owner];
+    }
+
+    function totalSupply () constant returns (uint totalSupply) {
+        return totalSupply;
     }
 }

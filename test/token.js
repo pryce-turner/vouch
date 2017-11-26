@@ -15,7 +15,7 @@ contract ('Identity', function (accounts) {
         }).then(function () {
             return id.transfer(accounts[4], amount);
         }).then(function () {
-            return id.getBalanceOf.call(accounts[4]);
+            return id.balanceOf.call(accounts[4]);
         }).then(function (bal) {
             balance = bal;
 
@@ -34,7 +34,7 @@ contract ('Identity', function (accounts) {
 
             return id.buy({from: accounts[3], value: weiSent}); 
         }).then(function () {
-            return id.getBalanceOf.call(accounts[3]);
+            return id.balanceOf.call(accounts[3]);
         }).then (function (X) {
             endingBalance=X;
 

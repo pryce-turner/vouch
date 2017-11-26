@@ -3,7 +3,7 @@ pragma solidity ^0.4.11;
 import "./Identitoken.sol";
 
 
-contract Identity is Identitoken (1000) {
+contract Identity is Identitoken (100000) {
 
 
     mapping (address => uint) public identityFundBalance;
@@ -24,10 +24,10 @@ contract Identity is Identitoken (1000) {
     function verify (address user1, address user2) returns (bool) {
         require ((approvedConnections[user1][user2]) && (approvedConnections[user2][user1]));
         require ((!isFrozen[user1]) && (!isFrozen[user2]));
-        require (balanceOf[user1] > standardDeposit);
-        require (balanceOf[user2] > standardDeposit);
-        balanceOf[user1] -= standardDeposit;
-        balanceOf[user2] -= standardDeposit;
+        require (balances[user1] > standardDeposit);
+        require (balances[user2] > standardDeposit);
+        balances[user1] -= standardDeposit;
+        balances[user2] -= standardDeposit;
         identityFundBalance[user1] += standardDeposit;
         identityFundBalance[user2] += standardDeposit;
         verifiedConnections[user1][user2] = true;

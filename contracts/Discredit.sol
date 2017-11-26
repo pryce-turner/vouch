@@ -66,7 +66,7 @@ contract Discredit is Identity {
         for (var i = 0; i<voters.length; i++) {
             if ((voters[i].voteType == 0) && (outcome == false)) { //Voted fake, account fake.
             identityFundBalance[upForVote] -= standardDeposit;
-            balanceOf[voters[i].voterAddress] += standardDeposit;
+            balances[voters[i].voterAddress] += (standardDeposit * 2); //Receives fake account's deposit and his own is returned.
             approvedConnections[upForVote][voters[i].voterAddress] = false;
             approvedConnections[voters[i].voterAddress][upForVote] = false;
             } else if ((voters[i].voteType == 1) && (outcome == false)) { //Voted real, account fake.
@@ -80,9 +80,7 @@ contract Discredit is Identity {
             identityFundBalance[upForVote] += standardDeposit;
             approvedConnections[upForVote][voters[i].voterAddress] = false;
             approvedConnections[voters[i].voterAddress][upForVote] = false;
-            } else {
-            approvedConnections[upForVote][voters[i].voterAddress] = false;
-            approvedConnections[voters[i].voterAddress][upForVote] = false;
+            } else { //Voted real, account real.
             }
         }
     }
@@ -91,10 +89,10 @@ contract Discredit is Identity {
         return voters[voterID[target]].voteType;
     }
 
-    function getVoteCount (bool voteType) returns (uint) {
-        if (voteType)
+    function getVoteCount (uint voteType) returns (uint) {
+        if (voteType == 1)
         return count[upForVote].voteReal;
-        if (!voteType)
+        if (voteType == 0)
         return count[upForVote].voteFake;
     }
 
