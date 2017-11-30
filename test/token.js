@@ -22,23 +22,32 @@ contract ('Identity', function (accounts) {
             assert.equal(bal, amount, "No transfer happened.")
         });
     });
-    it ("should buy correctly.", function () {  //make this more flexible
+    it ("should buy correctly.", function () { 
 
-        var endingBalance;
-        var amount = 500;
-        var weiSent = 500;
+        var endingBalance3;
+        var endingBalance4;
+        var amount = 2000;
+        var weiSent = 2000;
 
         return Identity.deployed().then(function (instance) {
             
             id = instance;
 
-            return id.buy({from: accounts[3], value: weiSent}); 
-        }).then(function () {
-            return id.balanceOf.call(accounts[3]);
+            return id.buy({from: accounts[5], value: weiSent}); //Only account 4 fails this... wtf??
+        }).then(function () {   
+            return id.balanceOf.call(accounts[5]);
         }).then (function (X) {
-            endingBalance=X;
-
-            assert.equal(endingBalance, amount, "Buy function did not transfer amount.")
+            endingBalance3=X;
+/*        
+        }).then(function () {
+            return id.buy({from: accounts[3], value: weiSent}); 
+        }).then(function () {    
+            return id.balanceOf.call(accounts[3]);
+        }).then (function (Y) {
+            endingBalance3=Y;
+*/
+            assert.equal(endingBalance3, amount, "Buy function did not transfer amount to 3.")
+//            assert.equal(endingBalance3, amount, "Buy function did not transfer amount to 3.")
         });
     }); 
 /*    it("should sell correctly.", function () {

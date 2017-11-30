@@ -3,13 +3,16 @@ pragma solidity ^0.4.11;
 import "./Identitoken.sol";
 
 
-contract Identity is Identitoken (100000) {
+contract Identity is Identitoken (10000) {
+    
+    uint standardDeposit = 100;
 
+    event ConnectionMade (address account1, address account2);
 
     mapping (address => uint) public identityFundBalance;
     mapping (address => mapping (address => bool)) public approvedConnections;
     mapping (address => mapping (address => bool)) public verifiedConnections;
-    uint standardDeposit = 100;
+    
 
 
     function Identity () {
@@ -32,7 +35,13 @@ contract Identity is Identitoken (100000) {
         identityFundBalance[user2] += standardDeposit;
         verifiedConnections[user1][user2] = true;
         verifiedConnections[user2][user1] = true;
+        ConnectionMade (user1, user2);
         return true;
+    }
+
+    function _disconnect (address account1, address account2) internal {
+        approvedConnections[account1][account2] = false;
+        approvedConnections[account2][account1] = false;
     }
 
     function getIdentityFundBalance (address addr) returns (uint) {

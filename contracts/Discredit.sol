@@ -20,6 +20,7 @@ contract Discredit is Identity {
     
     mapping (address => Count) public count;
     mapping (address => uint) public voterID;
+    mapping (address => bool) public blacklist;
     uint numVoters;
    
     address upForVote;
@@ -40,7 +41,7 @@ contract Discredit is Identity {
 
     function register () canVote {
         voters.push(Voter({
-            voteType: 2,
+            voteType: 2, //2 meaning no vote
             voted: false,
             voterAddress: msg.sender 
         }));
@@ -66,22 +67,21 @@ contract Discredit is Identity {
         for (var i = 0; i<voters.length; i++) {
             if ((voters[i].voteType == 0) && (outcome == false)) { //Voted fake, account fake.
             identityFundBalance[upForVote] -= standardDeposit;
+            identityFundBalance[voters[i].voterAddress] -= standardDeposit;
             balances[voters[i].voterAddress] += (standardDeposit * 2); //Receives fake account's deposit and his own is returned.
-            approvedConnections[upForVote][voters[i].voterAddress] = false;
-            approvedConnections[voters[i].voterAddress][upForVote] = false;
+            _disconnect(voters[i].voterAddress, upForVote);
             } else if ((voters[i].voteType == 1) && (outcome == false)) { //Voted real, account fake.
             identityFundBalance[upForVote] -= standardDeposit;
-            identityFundBalance[voters[i].voterAddress] -= standardDeposit; //Need to send the deposit somewhere..
-            approvedConnections[upForVote][voters[i].voterAddress] = false;
-            approvedConnections[voters[i].voterAddress][upForVote] = false;
-            isFrozen[voters[i].voterAddress] = true;
+            identityFundBalance[voters[i].voterAddress] -= standardDeposit;
+            balances[this] += (standardDeposit * 2);
+            _disconnect(voters[i].voterAddress, upForVote);
+            isFrozen[upForVote] = true;
+            blacklist[voters[i].voterAddress] = true;
             } else if ((voters[i].voteType == 0) && (outcome == true)) { //Voted fake, account real.
             identityFundBalance[voters[i].voterAddress] -= standardDeposit;
-            identityFundBalance[upForVote] += standardDeposit;
-            approvedConnections[upForVote][voters[i].voterAddress] = false;
-            approvedConnections[voters[i].voterAddress][upForVote] = false;
-            } else { //Voted real, account real.
-            }
+            balances[upForVote] += standardDeposit;
+            _disconnect(voters[i].voterAddress, upForVote);
+            } else {} //Voted real, account real.
         }
     }
 
@@ -99,5 +99,9 @@ contract Discredit is Identity {
     function getOutcome () returns (bool) {
 //        require (block.number >= endTime);
         return ((count[upForVote].voteReal) > (count[upForVote].voteFake));
+    }
+
+    function isBlacklisted (address addr) returns (bool) {
+        return blacklist[addr];
     }
 }

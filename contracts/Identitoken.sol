@@ -38,6 +38,7 @@ contract Identitoken is Owned {
     }
 
     function buy () payable {
+        require(!isFrozen[msg.sender]);
         uint amount = msg.value / buyPrice;
         _transfer(this, msg.sender, amount);
     }
