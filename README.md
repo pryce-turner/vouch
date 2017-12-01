@@ -9,4 +9,4 @@ Vouch is a framework for building a network of real people. Built on Ethereum, V
 Pryce Turner – initial work
 
 ## License:
-This project is licensed under the MIT License - see the [LICENSE.md](vouch/LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/pryce06/vouch/blob/master/LICENSE.md) file for details
