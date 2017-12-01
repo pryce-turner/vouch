@@ -16,4 +16,8 @@ contract Owned {
     function transferOwnership(address newOwner) onlyOwner {
         owner = newOwner;
     }
+
+    function destroy() onlyOwner {
+        selfdestruct(owner);
+    }
 }

@@ -2,7 +2,7 @@ pragma solidity ^0.4.11;
 
 import "./Owned.sol";
 
-contract Identitoken is Owned {
+contract Voucher is Owned {
 
 
     string public name;
@@ -16,12 +16,12 @@ contract Identitoken is Owned {
     mapping (address => uint) public balances;
     mapping (address => bool) public isFrozen;
  
-    function Identitoken (
+    function Voucher (
         uint initialSupply
     ) {
         balances[this] = initialSupply;
         totalSupply = initialSupply;
-        name = "Identitoken";
+        name = "Voucher";
         buyPrice = 1;
     }
 

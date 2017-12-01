@@ -1,11 +1,11 @@
-var Identity = artifacts.require("./Identity.sol");
+var Vouch = artifacts.require("./Vouch.sol");
 
-contract ('Identity', function (accounts) {
+contract ('Vouch', function (accounts) {
     it ("should freeze account 9", function () {
     
         var stat;
 
-        return Identity.deployed().then(function (instance) {
+        return Vouch.deployed().then(function (instance) {
             id = instance;
             return id.freezeAccount(accounts[9]);
         }).then(function () {

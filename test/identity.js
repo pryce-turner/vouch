@@ -1,13 +1,13 @@
-var Identity = artifacts.require("./Identity.sol");
+var Vouch = artifacts.require("./Vouch.sol");
 
-contract ('Identity', function (accounts) {
+contract ('Vouch', function (accounts) {
     it ("should make a connection properly", function () {
         
         var id;
         var verified1;
         var verified2;
 
-        return Identity.deployed().then(function (instance) {
+        return Vouch.deployed().then(function (instance) {
             id=instance;
             return id.makeConnection(accounts[1]);
         }).then(function () {
@@ -29,7 +29,7 @@ contract ('Identity', function (accounts) {
         var fund1;
         var fund0;
 
-        return Identity.deployed().then(function (instance) {
+        return Vouch.deployed().then(function (instance) {
             id=instance;
             return id.makeConnection(accounts[1]);
         }).then(function () {

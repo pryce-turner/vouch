@@ -1,21 +1,21 @@
 pragma solidity ^0.4.11;
 
-import "./Identitoken.sol";
+import "./Voucher.sol";
 
 
-contract Identity is Identitoken (10000) {
+contract Vouch is Voucher (10000) {
     
     uint standardDeposit = 100;
 
     event ConnectionMade (address account1, address account2);
 
-    mapping (address => uint) public identityFundBalance;
+    mapping (address => uint) public IdentityFundBalance;
     mapping (address => mapping (address => bool)) public approvedConnections;
     mapping (address => mapping (address => bool)) public verifiedConnections;
     
 
 
-    function Identity () {
+    function Vouch () {
         
     }
 
@@ -31,21 +31,25 @@ contract Identity is Identitoken (10000) {
         require (balances[user2] > standardDeposit);
         balances[user1] -= standardDeposit;
         balances[user2] -= standardDeposit;
-        identityFundBalance[user1] += standardDeposit;
-        identityFundBalance[user2] += standardDeposit;
+        IdentityFundBalance[user1] += standardDeposit;
+        IdentityFundBalance[user2] += standardDeposit;
         verifiedConnections[user1][user2] = true;
         verifiedConnections[user2][user1] = true;
         ConnectionMade (user1, user2);
         return true;
     }
 
-    function _disconnect (address account1, address account2) internal {
-        approvedConnections[account1][account2] = false;
-        approvedConnections[account2][account1] = false;
+    function disconnect (address user1, address user2) internal {
+        approvedConnections[user1][user2] = false;
+        approvedConnections[user2][user1] = false;
+        balances[user1] += standardDeposit;
+        balances[user2] += standardDeposit;
+        IdentityFundBalance[user1] -= standardDeposit;
+        IdentityFundBalance[user2] -= standardDeposit;
     }
 
     function getIdentityFundBalance (address addr) returns (uint) {
-        return identityFundBalance[addr];
+        return IdentityFundBalance[addr];
     }
 
     function getConnectionStatus (address user1, address user2) returns (bool) {

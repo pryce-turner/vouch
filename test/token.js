@@ -1,13 +1,13 @@
-var Identity = artifacts.require("./Identity.sol");
+var Vouch = artifacts.require("./Vouch.sol");
 
-contract ('Identity', function (accounts) {
+contract ('Vouch', function (accounts) {
     it ("should transfer", function () {
         
         var balance;
         var id;
         var amount = 200;
 
-        return Identity.deployed().then(function (instance) {
+        return Vouch.deployed().then(function (instance) {
             
             id = instance;
 
@@ -29,7 +29,7 @@ contract ('Identity', function (accounts) {
         var amount = 2000;
         var weiSent = 2000;
 
-        return Identity.deployed().then(function (instance) {
+        return Vouch.deployed().then(function (instance) {
             
             id = instance;
 
@@ -56,7 +56,7 @@ contract ('Identity', function (accounts) {
         var thisStartingBalance;
         var amount = 200;
 
-        return Identity.deployed().then(function (instance) {
+        return Vouch.deployed().then(function (instance) {
             
             id = instance;
 

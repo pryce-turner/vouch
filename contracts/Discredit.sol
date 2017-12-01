@@ -1,8 +1,8 @@
 pragma solidity ^0.4.11;
 
-import "./Identity.sol";
+import "./Vouch.sol";
 
-contract Discredit is Identity {
+contract Discredit is Vouch {
 
 
     struct Voter {
@@ -66,21 +66,26 @@ contract Discredit is Identity {
         bool outcome = ((count[upForVote].voteReal) > (count[upForVote].voteFake));
         for (var i = 0; i<voters.length; i++) {
             if ((voters[i].voteType == 0) && (outcome == false)) { //Voted fake, account fake.
-            identityFundBalance[upForVote] -= standardDeposit;
-            identityFundBalance[voters[i].voterAddress] -= standardDeposit;
-            balances[voters[i].voterAddress] += (standardDeposit * 2); //Receives fake account's deposit and his own is returned.
-            _disconnect(voters[i].voterAddress, upForVote);
-            } else if ((voters[i].voteType == 1) && (outcome == false)) { //Voted real, account fake.
-            identityFundBalance[upForVote] -= standardDeposit;
-            identityFundBalance[voters[i].voterAddress] -= standardDeposit;
-            balances[this] += (standardDeposit * 2);
-            _disconnect(voters[i].voterAddress, upForVote);
-            isFrozen[upForVote] = true;
-            blacklist[voters[i].voterAddress] = true;
+                IdentityFundBalance[upForVote] -= standardDeposit;
+                IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
+                balances[voters[i].voterAddress] += (standardDeposit * 2); //Receives fake account's deposit and his own is returned.
+                approvedConnections[voters[i].voterAddress][upForVote] = false;
+                approvedConnections[upForVote][voters[i].voterAddress] = false;
+            } else if ((voters[i].voteType == 1) && (outcome == false) || (voters[i].voteType == 2) && (outcome == false)) { //Voted real or abstained, account fake.
+                IdentityFundBalance[upForVote] -= standardDeposit;
+                IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
+                balances[this] += (standardDeposit * 2);
+                approvedConnections[voters[i].voterAddress][upForVote] = false;
+                approvedConnections[upForVote][voters[i].voterAddress] = false;                
+                isFrozen[upForVote] = true;
+                blacklist[voters[i].voterAddress] = true;
             } else if ((voters[i].voteType == 0) && (outcome == true)) { //Voted fake, account real.
-            identityFundBalance[voters[i].voterAddress] -= standardDeposit;
-            balances[upForVote] += standardDeposit;
-            _disconnect(voters[i].voterAddress, upForVote);
+                IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
+                balances[upForVote] += standardDeposit;
+                approvedConnections[voters[i].voterAddress][upForVote] = false;
+                approvedConnections[upForVote][voters[i].voterAddress] = false;            
+            } else if ((voters[i].voteType == 2) && (outcome == true)) { //Voter abstained, account real.
+                disconnect(upForVote, voters[i].voterAddress);
             } else {} //Voted real, account real.
         }
     }
