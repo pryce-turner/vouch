@@ -1,9 +1,11 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.15;
 
 import "./Owned.sol";
+import "./SafeMath.sol";
 
 contract Voucher is Owned {
 
+    using SafeMath for uint256;
 
     string public name;
     uint8 public decimals;
@@ -57,7 +59,7 @@ contract Voucher is Owned {
         return balances[_owner];
     }
 
-    function totalSupply () constant returns (uint totalSupply) {
+    function totalSupply () constant returns (uint) {
         return totalSupply;
     }
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.15;
 
 import "./Vouch.sol";
 
@@ -64,7 +64,7 @@ contract Discredit is Vouch {
     function executeOutcomes () {
 //        require (block.number >= endTime);
         bool outcome = ((count[upForVote].voteReal) > (count[upForVote].voteFake));
-        for (var i = 0; i<voters.length; i++) {
+        for (uint32 i = 0; i<voters.length; i++) {
             if ((voters[i].voteType == 0) && (outcome == false)) { //Voted fake, account fake.
                 IdentityFundBalance[upForVote] -= standardDeposit;
                 IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
@@ -90,23 +90,23 @@ contract Discredit is Vouch {
         }
     }
 
-    function getVoteType (address target) returns (uint) {
+    function getVoteType (address target) view returns (uint) {
         return voters[voterID[target]].voteType;
     }
 
-    function getVoteCount (uint voteType) returns (uint) {
+    function getVoteCount (uint voteType) view returns (uint) {
         if (voteType == 1)
         return count[upForVote].voteReal;
         if (voteType == 0)
         return count[upForVote].voteFake;
     }
 
-    function getOutcome () returns (bool) {
+    function getOutcome () view returns (bool) {
 //        require (block.number >= endTime);
         return ((count[upForVote].voteReal) > (count[upForVote].voteFake));
     }
 
-    function isBlacklisted (address addr) returns (bool) {
+    function isBlacklisted (address addr) view returns (bool) {
         return blacklist[addr];
     }
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.15;
 
 import "./Voucher.sol";
 
@@ -40,6 +40,7 @@ contract Vouch is Voucher (10000) {
     }
 
     function disconnect (address user1, address user2) internal {
+        require ((user1 == msg.sender) || (user2 == msg.sender));
         approvedConnections[user1][user2] = false;
         approvedConnections[user2][user1] = false;
         balances[user1] += standardDeposit;
@@ -48,11 +49,11 @@ contract Vouch is Voucher (10000) {
         IdentityFundBalance[user2] -= standardDeposit;
     }
 
-    function getIdentityFundBalance (address addr) returns (uint) {
+    function getIdentityFundBalance (address addr) view returns (uint) {
         return IdentityFundBalance[addr];
     }
 
-    function getConnectionStatus (address user1, address user2) returns (bool) {
+    function getConnectionStatus (address user1, address user2) view returns (bool) {
         return approvedConnections[user1][user2];
     }
 }
