@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 import "./Vouch.sol";
 
@@ -8,7 +8,6 @@ contract Discredit is Vouch {
     struct Voter {
         uint8 voteType;
         bool voted;
-        address voterAddress;
     }
 
     struct Count {
@@ -16,10 +15,9 @@ contract Discredit is Vouch {
         uint voteFake;
     }
 
-    Voter[] public voters;
     
     mapping (address => Count) public count;
-    mapping (address => uint) public voterID;
+    mapping (address => Voter) public voters;
     mapping (address => bool) public blacklist;
     uint numVoters;
    
@@ -39,55 +37,45 @@ contract Discredit is Vouch {
         endTime = block.number + 23600; //About a week's worth of blocks.
     }
 
-    function register () canVote {
-        voters.push(Voter({
-            voteType: 2, //2 meaning no vote
-            voted: false,
-            voterAddress: msg.sender 
-        }));
-        voterID[msg.sender] = (voters.length) - 1;
-    }
-
     function castVote (uint voteType) canVote {
-        require (!(voters[voterID[msg.sender]].voted));
+        require (!(voters[msg.sender].voted));
         if (voteType == 1) {//1 here meaning "Real" account.
         count[upForVote].voteReal++;
-        voters[voterID[msg.sender]].voteType = 1;
+        voters[msg.sender].voteType = 1;
         }
         if (voteType == 0) {//0 here meaning "Fake" acount.
         count[upForVote].voteFake++;
-        voters[voterID[msg.sender]].voteType = 0;
+        voters[msg.sender].voteType = 0;
         }
-        voters[voterID[msg.sender]].voted = true;
+        voters[msg.sender].voted = true;
+        voteInProgress[msg.sender] = true;
     }
 
-    function executeOutcomes () {
+    function executeOutcomes () { //rewrite all of this to fit new voters mapping
 //        require (block.number >= endTime);
         bool outcome = ((count[upForVote].voteReal) > (count[upForVote].voteFake));
-        for (uint32 i = 0; i<voters.length; i++) {
-            if ((voters[i].voteType == 0) && (outcome == false)) { //Voted fake, account fake.
-                IdentityFundBalance[upForVote] -= standardDeposit;
-                IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
-                balances[voters[i].voterAddress] += (standardDeposit * 2); //Receives fake account's deposit and his own is returned.
-                approvedConnections[voters[i].voterAddress][upForVote] = false;
-                approvedConnections[upForVote][voters[i].voterAddress] = false;
-            } else if ((voters[i].voteType == 1) && (outcome == false) || (voters[i].voteType == 2) && (outcome == false)) { //Voted real or abstained, account fake.
-                IdentityFundBalance[upForVote] -= standardDeposit;
-                IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
-                balances[this] += (standardDeposit * 2);
-                approvedConnections[voters[i].voterAddress][upForVote] = false;
-                approvedConnections[upForVote][voters[i].voterAddress] = false;                
-                isFrozen[upForVote] = true;
-                blacklist[voters[i].voterAddress] = true;
-            } else if ((voters[i].voteType == 0) && (outcome == true)) { //Voted fake, account real.
-                IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
-                balances[upForVote] += standardDeposit;
-                approvedConnections[voters[i].voterAddress][upForVote] = false;
-                approvedConnections[upForVote][voters[i].voterAddress] = false;            
-            } else if ((voters[i].voteType == 2) && (outcome == true)) { //Voter abstained, account real.
-                disconnect(upForVote, voters[i].voterAddress);
-            } else {} //Voted real, account real.
-        }
+        if ((voters[i].voteType == 0) && (outcome == false)) { //Voted fake, account fake.
+            IdentityFundBalance[upForVote] -= standardDeposit;
+            IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
+            balances[voters[i].voterAddress] += (standardDeposit * 2); //Receives fake account's deposit and his own is returned.
+            approvedConnections[voters[i].voterAddress][upForVote] = false;
+            approvedConnections[upForVote][voters[i].voterAddress] = false;
+        } else if ((voters[i].voteType == 1) && (outcome == false) || (voters[i].voteType == 2) && (outcome == false)) { //Voted real or abstained, account fake.
+            IdentityFundBalance[upForVote] -= standardDeposit;
+            IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
+            balances[this] += (standardDeposit * 2);
+            approvedConnections[voters[i].voterAddress][upForVote] = false;
+            approvedConnections[upForVote][voters[i].voterAddress] = false;                
+            isFrozen[upForVote] = true;
+            blacklist[voters[i].voterAddress] = true;
+        } else if ((voters[i].voteType == 0) && (outcome == true)) { //Voted fake, account real.
+            IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
+            balances[upForVote] += standardDeposit;
+            approvedConnections[voters[i].voterAddress][upForVote] = false;
+            approvedConnections[upForVote][voters[i].voterAddress] = false;            
+        } else if ((voters[i].voteType == 2) && (outcome == true)) { //Voter abstained, account real.
+            disconnect(upForVote, voters[i].voterAddress);
+        } else {} //Voted real, account real.    
     }
 
     function getVoteType (address target) view returns (uint) {
