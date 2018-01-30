@@ -12,7 +12,6 @@ contract Vouch is Voucher (10000) {
     mapping (address => uint) public IdentityFundBalance;
     mapping (address => mapping (address => bool)) public approvedConnections;
     mapping (address => mapping (address => bool)) public verifiedConnections;
-    mapping (address => bool) public voteInProgress;
     
 
 

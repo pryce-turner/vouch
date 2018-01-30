@@ -14,7 +14,6 @@ contract Discredit is Vouch {
         uint voteReal;
         uint voteFake;
     }
-
     
     mapping (address => Count) public count;
     mapping (address => Voter) public voters;
@@ -31,10 +30,10 @@ contract Discredit is Vouch {
         _;
     }
 
-    function Discredit (address target) { //Set address in deploy_contracts as accounts[1] from testrpc.
+    function Discredit (address target) { //Set address in deploy_contracts as accounts[1] from ganache.
         upForVote = target;
         startTime = block.number;
-        endTime = block.number + 23600; //About a week's worth of blocks.
+        endTime = (block.number + 23600); //About a week's worth of blocks.
     }
 
     function castVote (uint voteType) canVote {
@@ -54,32 +53,32 @@ contract Discredit is Vouch {
     function executeOutcomes () { //rewrite all of this to fit new voters mapping
 //        require (block.number >= endTime);
         bool outcome = ((count[upForVote].voteReal) > (count[upForVote].voteFake));
-        if ((voters[i].voteType == 0) && (outcome == false)) { //Voted fake, account fake.
+        if ((voters[msg.sender].voteType == 0) && (outcome == false)) { //Voted fake, account fake.
             IdentityFundBalance[upForVote] -= standardDeposit;
-            IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
-            balances[voters[i].voterAddress] += (standardDeposit * 2); //Receives fake account's deposit and his own is returned.
-            approvedConnections[voters[i].voterAddress][upForVote] = false;
-            approvedConnections[upForVote][voters[i].voterAddress] = false;
-        } else if ((voters[i].voteType == 1) && (outcome == false) || (voters[i].voteType == 2) && (outcome == false)) { //Voted real or abstained, account fake.
+            IdentityFundBalance[msg.sender] -= standardDeposit;
+            balances[msg.sender] += (standardDeposit * 2); //Receives fake account's deposit and his own is returned.
+            approvedConnections[msg.sender][upForVote] = false;
+            approvedConnections[upForVote][msg.sender] = false;
+        } else if ((voters[msg.sender].voteType == 1) && (outcome == false) || (voters[msg.sender].voteType == 2) && (outcome == false)) { //Voted real or abstained, account fake.
             IdentityFundBalance[upForVote] -= standardDeposit;
-            IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
+            IdentityFundBalance[msg.sender] -= standardDeposit;
             balances[this] += (standardDeposit * 2);
-            approvedConnections[voters[i].voterAddress][upForVote] = false;
-            approvedConnections[upForVote][voters[i].voterAddress] = false;                
+            approvedConnections[msg.sender][upForVote] = false;
+            approvedConnections[upForVote][msg.sender] = false;                
             isFrozen[upForVote] = true;
-            blacklist[voters[i].voterAddress] = true;
-        } else if ((voters[i].voteType == 0) && (outcome == true)) { //Voted fake, account real.
-            IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
+            blacklist[msg.sender] = true;
+        } else if ((voters[msg.sender].voteType == 0) && (outcome == true)) { //Voted fake, account real.
+            IdentityFundBalance[msg.sender] -= standardDeposit;
             balances[upForVote] += standardDeposit;
-            approvedConnections[voters[i].voterAddress][upForVote] = false;
-            approvedConnections[upForVote][voters[i].voterAddress] = false;            
-        } else if ((voters[i].voteType == 2) && (outcome == true)) { //Voter abstained, account real.
-            disconnect(upForVote, voters[i].voterAddress);
+            approvedConnections[msg.sender][upForVote] = false;
+            approvedConnections[upForVote][msg.sender] = false;            
+        } else if ((voters[msg.sender].voteType == 2) && (outcome == true)) { //Voter abstained, account real.
+            disconnect(upForVote, msg.sender);
         } else {} //Voted real, account real.    
     }
 
     function getVoteType (address target) view returns (uint) {
-        return voters[voterID[target]].voteType;
+        return voters[target].voteType;
     }
 
     function getVoteCount (uint voteType) view returns (uint) {

@@ -17,6 +17,7 @@ contract Voucher is Owned {
 
     mapping (address => uint) public balances;
     mapping (address => bool) public isFrozen;
+    mapping (address => bool) public voteInProgress; //use as switch to limit app functionality if 'true'
  
     function Voucher (
         uint initialSupply
@@ -40,12 +41,13 @@ contract Voucher is Owned {
     }
 
     function buy () payable {
-        require(!isFrozen[msg.sender]);
+        require (!isFrozen[msg.sender]);
         uint amount = msg.value / buyPrice;
         _transfer(this, msg.sender, amount);
     }
 
     function sell (uint amount) {
+        require(!voteInProgress[msg.sender]); //cannot sell tokens if in a vote
         require(this.balance >= amount * sellPrice);
         _transfer(msg.sender, this, amount);
         msg.sender.transfer(amount * sellPrice);

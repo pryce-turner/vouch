@@ -8,6 +8,6 @@ module.exports = function(deployer) {
   deployer.deploy(Vouch);
   deployer.deploy(Voucher);
   deployer.deploy(Owned);
-  deployer.deploy(Discredit, "0x46f634d5e18fc6153c0ca749c9cb496ff456b2af");
+  deployer.deploy(Discredit, "0x31c1e1aabbec3c49dbcc3ca8eca33202197567e2");
   deployer.deploy(SafeMath);
 };

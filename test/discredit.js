@@ -1,10 +1,12 @@
 var Discredit = artifacts.require("./Discredit.sol");
 
 contract ('Discredit', function (accounts) {
-    it("should register the voter correctly.", function () {
+    it("should vote real.", function () {
 
         var voteType;
-
+        var voteCount;
+        var expected = 1;
+        
         return Discredit.deployed().then(function (instance) {
             
             dis = instance;
@@ -19,21 +21,8 @@ contract ('Discredit', function (accounts) {
         }).then(function () {
             return dis.verify(accounts[1], accounts[0]);
         }).then(function () {
-            return dis.register();
+            return dis.castVote(0);
         }).then(function () {
-            return dis.getVoteType.call(accounts[0]) 
-        }).then(function (X) {
-            voteType = X;
-
-            assert.equal(voteType, 2, "Message Sender did not register.")
-        });
-    });
-    it("should vote real.", function () {
-
-        var voteCount;
-        var expected = 1;
-
-        return dis.castVote(0).then(function () {
             
             return dis.getVoteCount.call(0);
         
@@ -80,8 +69,6 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
             return dis.makeConnection(accounts[0], {from:accounts[1]});
         }).then(function () {
             return dis.verify(accounts[1], accounts[0]);
-        }).then(function () {
-            return dis.register();
         }).then(function () {
             return dis.castVote(0);
         }).then(function () {
@@ -130,8 +117,6 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
             return dis.makeConnection(accounts[0], {from:accounts[1]});
         }).then(function () {
             return dis.verify(accounts[1], accounts[0]);
-        }).then(function () {
-            return dis.register();
         }).then(function () {
             return dis.castVote(1);
         }).then(function () {
@@ -199,12 +184,6 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
             return dis.verify(accounts[1], accounts[2]);
         }).then(function () {
             return dis.verify(accounts[3], accounts[1]);
-        }).then(function () {
-            return dis.register();
-        }).then(function () {
-            return dis.register({from:accounts[2]});
-        }).then(function () {
-            return dis.register({from:accounts[3]});
         }).then(function () {
             return dis.castVote(1); //Acc 0 is voting real on a fake account.
         }).then(function () {
@@ -318,12 +297,6 @@ contract ('Discredit', function (accounts) {
             return dis.verify(accounts[1], accounts[2]);
         }).then(function () {
             return dis.verify(accounts[3], accounts[1]);
-        }).then(function () {
-            return dis.register();
-        }).then(function () {
-            return dis.register({from:accounts[2]});
-        }).then(function () {
-            return dis.register({from:accounts[3]});
         }).then(function () {
             return dis.castVote(0); //Acc 0 is voting fake on a real account.
         }).then(function () {
