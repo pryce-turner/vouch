@@ -6,9 +6,9 @@ contract ('Discredit', function (accounts) {
         var voteType;
         var voteCount;
         var expected = 1;
-        
+
         return Discredit.deployed().then(function (instance) {
-            
+
             dis = instance;
 
             return dis.buy({from: accounts[1], value: 301});
@@ -21,11 +21,11 @@ contract ('Discredit', function (accounts) {
         }).then(function () {
             return dis.verify(accounts[1], accounts[0]);
         }).then(function () {
-            return dis.castVote(0);
+            return dis.castVote(2);
         }).then(function () {
-            
-            return dis.getVoteCount.call(0);
-        
+
+            return dis.getVoteCount.call(2);
+
         }).then(function (num) {
             voteCount = num;
 
@@ -34,7 +34,7 @@ contract ('Discredit', function (accounts) {
     });
     it("should print the outcome.", function () {
 
-        var expected = false;
+        var expected = true;
         var outcome;
 
 
@@ -43,7 +43,7 @@ contract ('Discredit', function (accounts) {
 
             assert.equal(outcome, expected, "Vote result was unexpected.")
         });
-    });     
+    });
 });
 contract ('Discredit', function (accounts) { //make this a solidity test at some point
     it("Vote fake, account fake.", function () {
@@ -57,7 +57,7 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
         var initialBuy = 499;
 
         return Discredit.deployed().then(function (instance) {
-            
+
             dis = instance;
 
             return dis.buy({from: accounts[1], value: initialBuy});
@@ -89,9 +89,9 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
                 assert.equal(IDbalanceAfter, 0, "IDFund deposit was not removed.")
                 assert.equal(acc0BalanceAfter, (initialBuy+100), "Deposit not awarded to Acc 0")
 
-            }); 
-        }); 
-    }); 
+            });
+        });
+    });
 });
 contract ('Discredit', function (accounts) { //make this a solidity test at some point
     it("Vote real, account real.", function () {
@@ -105,7 +105,7 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
         var initialBuy = 499;
 
         return Discredit.deployed().then(function (instance) {
-            
+
             dis = instance;
 
             return dis.buy({from: accounts[1], value: initialBuy});
@@ -136,9 +136,9 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
                 assert.equal(status1and0, true, "Connection is still established between 1 and 0.")
                 assert.equal(IDbalanceAfter, 100, "IDFund deposit was not removed.")
                 assert.equal(acc0BalanceAfter, (initialBuy-100), "Deposit not awarded to Acc 0")
-            }); 
-        }); 
-    }); 
+            });
+        });
+    });
 });
  contract ('Discredit', function (accounts) { //make this a solidity test at some point
     it("Vote real, account fake.", function () {
@@ -148,15 +148,15 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
         var status1and0;
         var outcome;
         var IDbalance1After;
-        var IDbalance0After;        
+        var IDbalance0After;
         var acc0BalAfter;
-        var acc1BalAfter;        
+        var acc1BalAfter;
         var acc2BalAfter;
-        var acc3BalAfter;        
+        var acc3BalAfter;
         var initialBuy = 400;
 
         return Discredit.deployed().then(function (instance) {
-            
+
             dis = instance;
 
             return dis.buy({from: accounts[0], value: initialBuy});
@@ -192,7 +192,7 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
             return dis.castVote(0, {from:accounts[3]});
         }).then(function () {
             return dis.executeOutcomes();
-        
+
         }).then(function () {
             return dis.getConnectionStatus.call(accounts[1], accounts[2]).then(function(connection){
                 status1and2 = connection;
@@ -236,7 +236,7 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
         }).then(function () {
             return dis.isBlacklisted.call(accounts[0]).then(function (black) {
                 blacklistStatus = black;
-        
+
 
                 assert.equal(status1and2, false, "Connection is still established between 1 and 2.")
                 assert.equal(status1and0, false, "Connection is still established between 1 and 0.")
@@ -244,16 +244,16 @@ contract ('Discredit', function (accounts) { //make this a solidity test at some
                 assert.equal(IDbalance1After, 0, "IDFund deposit was not removed from Acc 1.")
                 assert.equal(IDbalance0After, 0, "IDFund deposit was not removed from Acc 0.")
                 assert.equal(acc3BalanceAfter, (initialBuy+100), "Deposit not awarded to Acc 3")
-                assert.equal(acc2BalanceAfter, (initialBuy+100), "Deposit not awarded to Acc 2") 
+                assert.equal(acc2BalanceAfter, (initialBuy+100), "Deposit not awarded to Acc 2")
                 assert.equal(acc1BalanceAfter, (initialBuy-300), "Deposit not removed from Acc 1")
-                assert.equal(acc0BalanceAfter, (initialBuy-100), "Deposit not removed from Acc 0") 
+                assert.equal(acc0BalanceAfter, (initialBuy-100), "Deposit not removed from Acc 0")
                 assert.equal(blacklistStatus, true, "Account 0 not blacklisted.")
                 assert.equal(isFrozen, true, "Account 1 not frozen")
             });
-        }); 
+        });
     });
 });
-contract ('Discredit', function (accounts) { 
+contract ('Discredit', function (accounts) {
     it("Vote fake, account real.", function () {
 
         var status1and2;
@@ -261,15 +261,15 @@ contract ('Discredit', function (accounts) {
         var status1and0;
         var outcome;
         var IDbalance1After;
-        var IDbalance0After;        
+        var IDbalance0After;
         var acc0BalAfter;
-        var acc1BalAfter;        
+        var acc1BalAfter;
         var acc2BalAfter;
-        var acc3BalAfter;        
+        var acc3BalAfter;
         var initialBuy = 400;
 
         return Discredit.deployed().then(function (instance) {
-            
+
             dis = instance;
 
             return dis.buy({from: accounts[0], value: initialBuy});
@@ -305,7 +305,7 @@ contract ('Discredit', function (accounts) {
             return dis.castVote(1, {from:accounts[3]});
         }).then(function () {
             return dis.executeOutcomes();
-        
+
         }).then(function () {
             return dis.getConnectionStatus.call(accounts[1], accounts[2]).then(function(connection){
                 status1and2 = connection;
@@ -349,7 +349,7 @@ contract ('Discredit', function (accounts) {
         }).then(function () {
             return dis.isBlacklisted.call(accounts[0]).then(function (black) {
                 blacklistStatus = black;
-        
+
 
                 assert.equal(status1and2, true, "Connection is not established between 1 and 2.")
                 assert.equal(status1and0, false, "Connection is still established between 1 and 0.")
@@ -357,12 +357,12 @@ contract ('Discredit', function (accounts) {
                 assert.equal(IDbalance1After, 300, "IDFund deposit was not removed from Acc 1.")
                 assert.equal(IDbalance0After, 0, "IDFund deposit was not removed from Acc 0.")
                 assert.equal(acc3BalanceAfter, (initialBuy-100), "Deposit not awarded to Acc 3")
-                assert.equal(acc2BalanceAfter, (initialBuy-100), "Deposit not awarded to Acc 2") 
+                assert.equal(acc2BalanceAfter, (initialBuy-100), "Deposit not awarded to Acc 2")
                 assert.equal(acc1BalanceAfter, (initialBuy-200), "Deposit not removed from Acc 1")
-                assert.equal(acc0BalanceAfter, (initialBuy-100), "Deposit not removed from Acc 0") 
+                assert.equal(acc0BalanceAfter, (initialBuy-100), "Deposit not removed from Acc 0")
                 assert.equal(blacklistStatus, false, "Account 0 blacklisted.")
                 assert.equal(isFrozen, false, "Account 1 frozen")
             });
-        }); 
+        });
     });
-}); 
+});

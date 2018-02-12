@@ -6,15 +6,15 @@ contract Discredit is Vouch {
 
 
     struct Count {
-        uint voteReal;
-        uint voteFake;
+        uint8 voteReal;
+        uint8 voteFake;
     }
-    
+
     mapping (address => Count) public count;
-    mapping (address => uint) public voteType;
+    mapping (address => uint8) public voteType;
     mapping (address => bool) public blacklist;
     uint numVoters;
-   
+
     address upForVote;
     uint startTime;
     uint endTime;
@@ -31,13 +31,13 @@ contract Discredit is Vouch {
         endTime = (block.number + 23600); //About a week's worth of blocks.
     }
 
-    function castVote (uint voteType) canVote {
-//        require (voteType[msg.sender] == 0);
-        if (voteType == 2) {//2 here meaning "Real" account.
+    function castVote (uint8 _voteType) canVote {
+//        require (_voteType[msg.sender] == 0);
+        if (_voteType == 2) {//2 here meaning "Real" account.
         count[upForVote].voteReal++;
         voteType[msg.sender] = 2;
         }
-        if (voteType == 1) {//1 here meaning "Fake" acount.
+        if (_voteType == 1) {//1 here meaning "Fake" acount.
         count[upForVote].voteFake++;
         voteType[msg.sender] = 1;
         }
@@ -53,32 +53,33 @@ contract Discredit is Vouch {
             balances[msg.sender] += (standardDeposit * 2); //Receives fake account's deposit and his own is returned.
             approvedConnections[msg.sender][upForVote] = false;
             approvedConnections[upForVote][msg.sender] = false;
-        } else if ((voteType[msg.sender] == 2) && (outcome == false) || (voteType[msg.sender] == 0) && (outcome == false)) { //Voted real or abstained, account fake.
+        } else if ((voteType[msg.sender] == 2) && (outcome == false) ||
+        (voteType[msg.sender] == 0) && (outcome == false)) { //Voted real or abstained, account fake.
             IdentityFundBalance[upForVote] -= standardDeposit;
             IdentityFundBalance[msg.sender] -= standardDeposit;
             balances[this] += (standardDeposit * 2);
             approvedConnections[msg.sender][upForVote] = false;
-            approvedConnections[upForVote][msg.sender] = false;                
+            approvedConnections[upForVote][msg.sender] = false;
             isFrozen[upForVote] = true;
             blacklist[msg.sender] = true;
         } else if ((voteType[msg.sender] == 1) && (outcome == true)) { //Voted fake, account real.
             IdentityFundBalance[msg.sender] -= standardDeposit;
             balances[upForVote] += standardDeposit;
             approvedConnections[msg.sender][upForVote] = false;
-            approvedConnections[upForVote][msg.sender] = false;            
+            approvedConnections[upForVote][msg.sender] = false;
         } else if ((voteType[msg.sender] == 0) && (outcome == true)) { //Voter abstained, account real.
             disconnect(upForVote, msg.sender);
-        } else {} //Voted real, account real.    
+        } else {} //Voted real, account real.
     }
 
     function getVoteType (address target) view returns (uint8) {
         return voteType[target];
     }
 
-    function getVoteCount (uint8 voteType) view returns (uint) {
-        if (voteType == 2)
+    function getVoteCount (uint8 voteToFetch) view returns (uint) {
+        if (voteToFetch == 2)
         return count[upForVote].voteReal;
-        if (voteType == 1)
+        if (voteToFetch == 1)
         return count[upForVote].voteFake;
     }
 
