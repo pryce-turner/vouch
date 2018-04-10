@@ -1,6 +1,7 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 import "./Vouch.sol";
+
 
 contract Discredit is Vouch {
 
@@ -17,38 +18,38 @@ contract Discredit is Vouch {
     }
 
     Voter[] public voters;
-    
+
     mapping (address => Count) public count;
     mapping (address => uint) public voterID;
     mapping (address => bool) public blacklist;
     uint numVoters;
-   
+
     address upForVote;
     uint startTime;
     uint endTime;
 
     modifier canVote {
-        require ((approvedConnections[upForVote][msg.sender]) && (approvedConnections[msg.sender][upForVote]));
-        require ((startTime <= block.number) && (block.number <= endTime));
+        require((approvedConnections[upForVote][msg.sender]) && (approvedConnections[msg.sender][upForVote]));
+        require((startTime <= block.number) && (block.number <= endTime));
         _;
     }
 
-    function Discredit (address target) { //Set address in deploy_contracts as accounts[1] from testrpc.
+    function Discredit (address target) public { //Set address in deploy_contracts as accounts[1] from testrpc.
         upForVote = target;
         startTime = block.number;
         endTime = block.number + 23600; //About a week's worth of blocks.
     }
 
-    function register () canVote {
+    function register () public canVote {
         voters.push(Voter({
             voteType: 2, //2 meaning no vote
             voted: false,
-            voterAddress: msg.sender 
+            voterAddress: msg.sender
         }));
         voterID[msg.sender] = (voters.length) - 1;
     }
 
-    function castVote (uint voteType) canVote {
+    function castVote (uint voteType) public canVote {
         require (!(voters[voterID[msg.sender]].voted));
         if (voteType == 1) {//1 here meaning "Real" account.
         count[upForVote].voteReal++;
@@ -61,7 +62,7 @@ contract Discredit is Vouch {
         voters[voterID[msg.sender]].voted = true;
     }
 
-    function executeOutcomes () {
+    function executeOutcomes () public {
 //        require (block.number >= endTime);
         bool outcome = ((count[upForVote].voteReal) > (count[upForVote].voteFake));
         for (uint32 i = 0; i<voters.length; i++) {
@@ -76,37 +77,37 @@ contract Discredit is Vouch {
                 IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
                 balances[this] += (standardDeposit * 2);
                 approvedConnections[voters[i].voterAddress][upForVote] = false;
-                approvedConnections[upForVote][voters[i].voterAddress] = false;                
+                approvedConnections[upForVote][voters[i].voterAddress] = false;
                 isFrozen[upForVote] = true;
                 blacklist[voters[i].voterAddress] = true;
             } else if ((voters[i].voteType == 0) && (outcome == true)) { //Voted fake, account real.
                 IdentityFundBalance[voters[i].voterAddress] -= standardDeposit;
                 balances[upForVote] += standardDeposit;
                 approvedConnections[voters[i].voterAddress][upForVote] = false;
-                approvedConnections[upForVote][voters[i].voterAddress] = false;            
+                approvedConnections[upForVote][voters[i].voterAddress] = false;
             } else if ((voters[i].voteType == 2) && (outcome == true)) { //Voter abstained, account real.
                 disconnect(upForVote, voters[i].voterAddress);
             } else {} //Voted real, account real.
         }
     }
 
-    function getVoteType (address target) view returns (uint) {
+    function getVoteType (address target) public view returns (uint) {
         return voters[voterID[target]].voteType;
     }
 
-    function getVoteCount (uint voteType) view returns (uint) {
+    function getVoteCount (uint voteType) public view returns (uint) {
         if (voteType == 1)
         return count[upForVote].voteReal;
         if (voteType == 0)
         return count[upForVote].voteFake;
     }
 
-    function getOutcome () view returns (bool) {
+    function getOutcome () public view returns (bool) {
 //        require (block.number >= endTime);
         return ((count[upForVote].voteReal) > (count[upForVote].voteFake));
     }
 
-    function isBlacklisted (address addr) view returns (bool) {
+    function isBlacklisted (address addr) public view returns (bool) {
         return blacklist[addr];
     }
 }

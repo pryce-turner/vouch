@@ -1,10 +1,10 @@
-pragma solidity ^0.4.15; 
-  
-contract Owned { 
-    
+pragma solidity ^0.4.18;
+
+contract Owned {
+
     address public owner;
 
-    function Owned() {
+    function Owned() public {
         owner = msg.sender;
     }
 
@@ -13,11 +13,11 @@ contract Owned {
         _;
     }
 
-    function transferOwnership(address newOwner) onlyOwner {
+    function transferOwnership(address newOwner) public onlyOwner {
         owner = newOwner;
     }
 
-    function destroy() onlyOwner {
+    function destroy() public onlyOwner {
         selfdestruct(owner);
     }
 }

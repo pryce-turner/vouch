@@ -1,30 +1,26 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 import "./Voucher.sol";
 
 
 contract Vouch is Voucher (10000) {
-    
-    uint standardDeposit = 100;
+
+    uint public standardDeposit = 100;
 
     event ConnectionMade (address account1, address account2);
 
     mapping (address => uint) public IdentityFundBalance;
     mapping (address => mapping (address => bool)) public approvedConnections;
     mapping (address => mapping (address => bool)) public verifiedConnections;
-    
 
+    function Vouch () public {}
 
-    function Vouch () {
-        
-    }
-
-    function makeConnection (address target) returns (bool) {
+    function makeConnection (address target) public returns (bool) {
         approvedConnections[msg.sender][target] = true;
         return true;
     }
 
-    function verify (address user1, address user2) returns (bool) {
+    function verify (address user1, address user2) public returns (bool) {
         require ((approvedConnections[user1][user2]) && (approvedConnections[user2][user1]));
         require ((!isFrozen[user1]) && (!isFrozen[user2]));
         require (balances[user1] > standardDeposit);
@@ -35,7 +31,7 @@ contract Vouch is Voucher (10000) {
         IdentityFundBalance[user2] += standardDeposit;
         verifiedConnections[user1][user2] = true;
         verifiedConnections[user2][user1] = true;
-        ConnectionMade (user1, user2);
+        emit ConnectionMade (user1, user2);
         return true;
     }
 
@@ -49,11 +45,11 @@ contract Vouch is Voucher (10000) {
         IdentityFundBalance[user2] -= standardDeposit;
     }
 
-    function getIdentityFundBalance (address addr) view returns (uint) {
+    function getIdentityFundBalance (address addr) public view returns (uint) {
         return IdentityFundBalance[addr];
     }
 
-    function getConnectionStatus (address user1, address user2) view returns (bool) {
+    function getConnectionStatus (address user1, address user2) public view returns (bool) {
         return approvedConnections[user1][user2];
     }
 }
